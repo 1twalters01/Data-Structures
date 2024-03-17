@@ -8,10 +8,10 @@ Type Method/Property - definition
 
 Result<(), Err> PushFront(Key) - add an element to the front of the list
 Result<(), Err> PopFront() - remove the front element from the list
-Result<(), Err> Key TopFront() - return the front element from the list
+Key TopFront() - return the front element from the list
 Result<(), Err> PushBack(Key) or Append - add an element to the last of the list
 Result<(), Err> PopBack() - remove the last element from the list
-Key TopBack() - return the last element of the list - O(n) with no tail pointer
+Key TopBack() - return the last element of the list
 Boolean Find(Key) - is key in list?
 Result<(), Err> Erase(Key) - remove key from list
 Boolean Empty() - checks if the key is empty

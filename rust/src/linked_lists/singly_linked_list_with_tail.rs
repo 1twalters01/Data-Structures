@@ -297,8 +297,8 @@ where
 
         if self.tail.is_none() {
             self.head = Some(Box::new(node.clone()));
-            // self.tail = Some(Box::new(node));
-            self.tail = self.head;
+            self.tail = Some(Box::new(node));
+            // self.tail = self.head;
         } else {
             println!("next: {:?}", &self.clone().tail);
             self.tail.unwrap().next = Some(Box::new(node.clone()));
