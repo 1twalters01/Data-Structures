@@ -208,6 +208,25 @@ where
         return sllist.clone();
     }
 
+    pub fn update(&mut self) -> Result<(), Error> {
+        if self.head.is_none() {
+            return Ok(())
+        }
+
+        let mut count = 0;
+        let mut new_self: SLList<T> = SLList::new();
+        let mut node_current: SLListNode<T> = *self.head.unwrap();
+        while node_current.next().is_some() {
+            node_current.next = None;
+            node_current.index = count;
+            count += 1;
+            new_self.push_back(node_current.key);
+        }
+
+        self = &mut new_self;
+        return Ok(());
+    }
+
     /// Creates a node and push it to the front of the linked list.
     ///
     /// # Example
@@ -228,17 +247,43 @@ where
         if self.tail.is_none() {
             self.tail = self.clone().head;
         }
+
         self.length += 1;
+        self.updated = false;
 
         return Ok(())
     }
 
-    ///
+    /// Removes the front node of the linked list.
     ///
     /// # Example
     /// ```
     /// ```
-    // fn PopFront(self) -> Result<(), Error> {}
+    fn pop_front(&mut self) -> Result<(), Error> {
+        if self.head.is_none() {
+            let error: Error = Error::new(
+                ErrorKind::NotFound,
+                String::from("Cannot delete element from empty list"),
+            );
+
+            return Err(error);
+        }
+
+        self.head = match self.clone().head.unwrap().next() {
+            None => None,
+            Some(value) => Some(Box::new(value)),
+        };
+
+        if self.head.is_none() {
+            self.tail = None;
+        }
+
+        self.length -= 1;
+        self.updated = false;
+
+        return Ok(());
+    }
+
     // fn TopFront(self) -> Result<(), Error> {}
     // fn PushBack(self, key: T) -> Result<(), Error> {}
     // fn PopBack(self) -> Result<(), Error> {}
@@ -369,8 +414,30 @@ mod tests {
     fn test_empty_push_front() {
         let mut pushed_list = SLList::new();
         let _ = pushed_list.push_front(5);
-        let list = SLList::from(Vec::from([5]));
+
+        let mut list = SLList::from(Vec::from([5]));
+        list.updated = false;
 
         assert_eq!(pushed_list, list);
+    }
+
+    #[test]
+    fn test_push_front() {
+        let key_vec: Vec<i64> = vec![1, 8, 27, 64, 125];
+        let mut pushed_list = SLList::from(key_vec);
+        let _ = pushed_list.push_front(5);
+        let _ = pushed_list.update();
+
+        let key_vec: Vec<i64> = vec![5, 1, 8, 27, 64, 125];
+        let list = SLList::from(key_vec);
+
+        assert_eq!(pushed_list, list);
+    }
+
+    fn test_empty_pop_front() {
+        let mut list: SLList<i64> = SLList::new();
+        let pop_result: Result<(), Error> = list.pop_front();
+
+        assert_eq!(pop_result.is_err(), true)
     }
 }
