@@ -118,7 +118,7 @@ where
 
 impl<T> SLList<T>
 where
-    T: Clone + PartialEq,
+    T: Clone + PartialEq+ std::fmt::Debug,
 {
     /// Creates a new, empty instance of a linked list that lives on the stack.
     ///
@@ -215,15 +215,15 @@ where
 
         let mut count = 0;
         let mut new_self: SLList<T> = SLList::new();
-        let mut node_current: SLListNode<T> = *self.head.unwrap();
+        let mut node_current: SLListNode<T> = *self.clone().head.unwrap();
         while node_current.next().is_some() {
             node_current.next = None;
             node_current.index = count;
             count += 1;
-            new_self.push_back(node_current.key);
+            new_self = new_self.push_back(node_current.clone().key.unwrap());
         }
 
-        self = &mut new_self;
+        *self = new_self;
         return Ok(());
     }
 
@@ -259,7 +259,7 @@ where
     /// # Example
     /// ```
     /// ```
-    fn pop_front(&mut self) -> Result<(), Error> {
+    pub fn pop_front(&mut self) -> Result<(), Error> {
         if self.head.is_none() {
             let error: Error = Error::new(
                 ErrorKind::NotFound,
@@ -284,14 +284,34 @@ where
         return Ok(());
     }
 
-    fn top_front(self) -> Option<T> {
+    pub fn top_front(self) -> Option<T> {
         if self.head.is_none() {
             return None
         }
 
         return self.head.unwrap().key;
     }
-    // fn PushBack(self, key: T) -> Result<(), Error> {}
+
+    pub fn push_back(mut self, key: T) -> SLList<T> {
+        let node: SLListNode<T> = SLListNode::from(key, 0);
+
+        if self.tail.is_none() {
+            self.head = Some(Box::new(node.clone()));
+            // self.tail = Some(Box::new(node));
+            self.tail = self.head;
+        } else {
+            println!("next: {:?}", &self.clone().tail);
+            self.tail.unwrap().next = Some(Box::new(node.clone()));
+            self.tail = Some(Box::new(node));
+        }
+
+        self.length += 1;
+        self.updated = false;
+        println!("next: {:?}", self.tail);
+
+        return self;
+    }
+
     // fn PopBack(self) -> Result<(), Error> {}
     // fn TopBack(self) -> T {}
     // fn Find(self, Key: T) -> bool {}
@@ -440,6 +460,7 @@ mod tests {
         assert_eq!(pushed_list, list);
     }
 
+    #[test]
     fn test_empty_pop_front() {
         let mut list: SLList<i64> = SLList::new();
         let pop_result: Result<(), Error> = list.pop_front();
@@ -447,15 +468,43 @@ mod tests {
         assert_eq!(pop_result.is_err(), true);
     }
 
+    #[test]
     fn test_empty_top_front() {
         let list: SLList<i64> = SLList::new();
         assert_eq!(list.top_front(), None);
     }
 
+    #[test]
     fn test_top_front() {
         let key_vec: Vec<i64> = vec![1, 8, 27, 64];
         let list: SLList<i64> = SLList::from(key_vec);
 
         assert_eq!(list.top_front().unwrap(), 1);
     }
+
+    #[test]
+    fn test_empty_push_back() {
+        let mut pushed_list = SLList::new();
+        pushed_list  = pushed_list.push_back(5);
+
+        let mut list = SLList::from(Vec::from([5]));
+        list.updated = false;
+
+        assert_eq!(pushed_list, list);
+    }
+
+    #[test]
+    fn test_push_back() {
+        let key_vec: Vec<i64> = vec![1, 8, 27, 64, 125];
+        let mut pushed_list = SLList::from(key_vec);
+        pushed_list = pushed_list.push_back(5);
+        // let _ = pushed_list.update();
+
+        let key_vec: Vec<i64> = vec![1, 8, 27, 64, 125, 5];
+        let mut list = SLList::from(key_vec);
+        list.updated = false;
+
+        assert_eq!(pushed_list, list);
+    }
+
 }
