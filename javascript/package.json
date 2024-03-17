@@ -1,0 +1,18 @@
+{
+  "name": "javascript",
+  "version": "1.0.0",
+  "description": "Data structures in javascript",
+  "main": "index.js",
+  "scripts": {
+    "format": "prettier --config .prettierrc.json src/**/*.js --write",
+    "test": "jest"
+  },
+  "keywords": [],
+  "author": "1twalters01",
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "jsdoc": "^4.0.2",
+    "prettier": "^3.2.5"
+  }
+}
