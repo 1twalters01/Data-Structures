@@ -284,7 +284,13 @@ where
         return Ok(());
     }
 
-    // fn TopFront(self) -> Result<(), Error> {}
+    fn top_front(self) -> Option<T> {
+        if self.head.is_none() {
+            return None
+        }
+
+        return self.head.unwrap().key;
+    }
     // fn PushBack(self, key: T) -> Result<(), Error> {}
     // fn PopBack(self) -> Result<(), Error> {}
     // fn TopBack(self) -> T {}
@@ -438,6 +444,18 @@ mod tests {
         let mut list: SLList<i64> = SLList::new();
         let pop_result: Result<(), Error> = list.pop_front();
 
-        assert_eq!(pop_result.is_err(), true)
+        assert_eq!(pop_result.is_err(), true);
+    }
+
+    fn test_empty_top_front() {
+        let list: SLList<i64> = SLList::new();
+        assert_eq!(list.top_front(), None);
+    }
+
+    fn test_top_front() {
+        let key_vec: Vec<i64> = vec![1, 8, 27, 64];
+        let list: SLList<i64> = SLList::from(key_vec);
+
+        assert_eq!(list.top_front().unwrap(), 1);
     }
 }
