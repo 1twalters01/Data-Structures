@@ -1,4 +1,7 @@
 #![allow(dead_code)]
+#![allow(unused_imports)]
+
+use std::io::{Error, ErrorKind};
 
 /// An iterable node that forms a non-contiguous linked list.
 ///
@@ -101,13 +104,15 @@ where
     }
 }
 
+/// Todo upon completion 
 #[derive(Clone, PartialEq, Debug)]
 pub struct SLList<T>
 where
     T: Clone,
 {
-    pub head: Box<SLListNode<T>>,
-    pub tail: Box<SLListNode<T>>,
+    pub updated: bool,
+    pub head: Option<Box<SLListNode<T>>>, // Wrap in option
+    pub tail: Option<Box<SLListNode<T>>>, // Wrap in option
     pub length: usize,
 }
 
@@ -123,8 +128,9 @@ where
     ///
     /// let new_list: SLList<i64> = SLList::new();
     /// let list: SLList<i64> = SLList {
-    ///     head: Box::new(SLListNode::new()),
-    ///     tail: Box::new(SLListNode::new()),
+    ///     updated: true,
+    ///     head: None,
+    ///     tail: None,
     ///     length: 0,
     /// };
     ///
@@ -132,8 +138,9 @@ where
     /// ```
     pub fn new() -> SLList<T> {
         SLList {
-            head: Box::new(SLListNode::new()),
-            tail: Box::new(SLListNode::new()),
+            updated: true,
+            head: None,
+            tail: None,
             length: 0,
         }
     }
@@ -163,8 +170,9 @@ where
     /// node_1.next = Some(Box::new(node_2));
     ///
     /// let list: SLList<i64> = SLList {
-    ///     head: Box::new(node_1),
-    ///     tail: Box::new(node_4),
+    ///     updated: true,
+    ///     head: Some(Box::new(node_1)),
+    ///     tail: Some(Box::new(node_4)),
     ///     length: 4,
     /// };
     ///
@@ -182,7 +190,7 @@ where
             .map(|(index, key)| SLListNode::from(key, index))
             .collect();
 
-        sllist.tail = Box::new(node_vec.last().unwrap().clone());
+        sllist.tail = Some(Box::new(node_vec.last().unwrap().clone()));
         sllist.length = node_vec.len();
 
         let mut node_holder: Option<SLListNode<T>> = None;
@@ -195,17 +203,41 @@ where
             node_holder = Some(node);
         }
 
-        sllist.head = Box::new(node_holder.unwrap());
+        sllist.head = Some(Box::new(node_holder.unwrap()));
 
         return sllist.clone();
     }
 
-    // fn PushFront(self, key: T) -> Result<(), Error> {
-    //     let node = SLListNode::from(key);
-    //     node.next = Some(Box::new(self));
-    //
-    // }
-    //
+    /// Creates a node and push it to the front of the linked list.
+    ///
+    /// # Example
+    /// ```
+    /// use rust::linked_lists::singly_linked_list_with_tail::{ SLList, SLListNode };
+    ///
+    /// let mut pushed_list = SLList::new();
+    /// let _ = pushed_list.push_front(5);
+    /// let list = SLList::from(Vec::from([5]));
+    ///
+    /// assert_eq!(pushed_list, list);
+    /// ```
+    pub fn push_front(&mut self, key: T) -> Result<(), Error> {
+        let mut node: SLListNode<T> = SLListNode::from(key, 0);
+        node.next = self.clone().head;
+        self.head = Some(Box::new(node));
+
+        if self.tail.is_none() {
+            self.tail = self.clone().head;
+        }
+        self.length += 1;
+
+        return Ok(())
+    }
+
+    ///
+    ///
+    /// # Example
+    /// ```
+    /// ```
     // fn PopFront(self) -> Result<(), Error> {}
     // fn TopFront(self) -> Result<(), Error> {}
     // fn PushBack(self, key: T) -> Result<(), Error> {}
@@ -264,8 +296,9 @@ mod tests {
     fn test_list_new() {
         let new_list: SLList<i64> = SLList::new();
         let list: SLList<i64> = SLList {
-            head: Box::new(SLListNode::new()),
-            tail: Box::new(SLListNode::new()),
+            updated: true,
+            head: None,
+            tail: None,
             length: 0,
         };
 
@@ -277,8 +310,9 @@ mod tests {
         let key_vec: Vec<i64> = Vec::new();
         let new_list: SLList<i64> = SLList::from(key_vec);
         let list: SLList<i64> = SLList {
-            head: Box::new(SLListNode::new()),
-            tail: Box::new(SLListNode::new()),
+            updated: true,
+            head: None,
+            tail: None,
             length: 0,
         };
 
@@ -293,8 +327,9 @@ mod tests {
 
         let node = SLListNode::from(value, index);
         let list: SLList<i64> = SLList {
-            head: Box::new(node.clone()),
-            tail: Box::new(node),
+            updated: true,
+            head: Some(Box::new(node.clone())),
+            tail: Some(Box::new(node)),
             length: 1,
         };
 
@@ -321,11 +356,21 @@ mod tests {
         node_1.next = Some(Box::new(node_2));
 
         let list: SLList<i64> = SLList {
-            head: Box::new(node_1),
-            tail: Box::new(node_4),
+            updated: true,
+            head: Some(Box::new(node_1)),
+            tail: Some(Box::new(node_4)),
             length: 4,
         };
 
         assert_eq!(new_list, list);
+    }
+
+    #[test]
+    fn test_empty_push_front() {
+        let mut pushed_list = SLList::new();
+        let _ = pushed_list.push_front(5);
+        let list = SLList::from(Vec::from([5]));
+
+        assert_eq!(pushed_list, list);
     }
 }
