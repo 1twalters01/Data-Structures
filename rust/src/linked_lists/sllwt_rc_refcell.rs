@@ -188,11 +188,19 @@ mod tests {
     }
 
     #[test]
-    pub fn push_to_front() {}
+    pub fn test_empty_push_to_front() {}
 
     #[test]
-    pub fn pop_from_front() {}
+    pub fn test_push_to_front() {}
 
+    #[test]
+    pub fn test_empty_pop_from_front() {}
+
+    #[test]
+    pub fn test_one_pop_from_front() {}
+
+    #[test]
+    pub fn test_pop_from_front() {}
 
     #[test]
     fn test_empty_into_front() {
