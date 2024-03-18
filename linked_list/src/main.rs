@@ -1,35 +1,50 @@
+use std::{cell::RefCell, rc::Rc};
 extern crate rust;
-// use rust::linked_lists::singly_linked_list_with_tail::{SLList, SLListNode};
-use rust::linked_lists::sllwt_rc::{LinkedList, Node};
+use rust::linked_lists::sllwt_rc_refcell::{LinkedList, Node};
 
 // fn main() {
-//     let key_vec: Vec<i64> = vec![1, 8, 27, 64, 125];
-//     let mut pushed_list = SLList::from(key_vec);
-//     pushed_list = pushed_list.push_back(5);
-//     println!("next {:?}", &pushed_list.clone().tail.unwrap().next);
-//     
-//     let key_vec: Vec<i64> = vec![1, 8, 27, 64, 125, 5];
-//     let mut list = SLList::from(key_vec);
-//     list.updated = false;
+//     let data_vec: Vec<i64> = vec![2];
+//     let manual_list = LinkedList::from(data_vec);
 //
-//     assert_eq!(pushed_list, list);
+//     let (index, value): (usize, i64) = (8, 2);
+//     let function_node: Option<Rc<RefCell<Node<i64>>>> = Some(Rc::new(RefCell::new(Node::from(index, value))));
+//     let mut function_list: LinkedList<i64> = LinkedList {
+//         head: function_node.clone(),
+//         tail: function_node,
+//         length: 1,
+//         ordered: false,
+//     };
+//     function_list.update_indices();
+//
+//     assert_eq!(manual_list, function_list);
 // }
 
 fn main() {
-    let (index, value): (usize, i64) = (0, 8);
-    let (index_1, value_1): (usize, i64) = (1, 56);
-    let (index_2, value_2): (usize, i64) = (2, 19);
-    let (index_3, value_3): (usize, i64) = (3, 80);
+    let (index, value): (usize, i64) = (8, 2);
+    let (index_1, value_1): (usize, i64) = (2, 37);
 
-    let mut function_list: LinkedList<i64> = LinkedList::new();
-    function_list.push_to_end(value);
-    println!("tail: {:?}", function_list.tail);
-    function_list.push_to_end(value_1);
-    println!("tail: {:?}", function_list.tail);
-    function_list.push_to_end(value_2);
-    println!("tail: {:?}", function_list.tail);
-    function_list.push_to_end(value_3);
-    println!("tail: {:?}", function_list.tail);
+    // let data_vec: Vec<i64> = vec![value, value_1];
+    // let manual_list: LinkedList<i64> = LinkedList::from(data_vec);
 
-    println!("\nlist: {:#?}", function_list);
+    let node_1: Node<i64> = Node {
+        index: Some(index_1),
+        data: Some(value_1),
+        next: None,
+    };
+    let rc_refcell_node_1: Rc<RefCell<Node<i64>>> = Rc::new(RefCell::new(node_1));
+    let node: Node<i64> = Node {
+        index: Some(index),
+        data: Some(value),
+        next: Some(rc_refcell_node_1.clone()),
+    };
+    let mut function_list: LinkedList<i64> = LinkedList {
+        head: Some(Rc::new(RefCell::new(node))),
+        tail: Some(rc_refcell_node_1.clone()),
+        length: 2,
+        ordered: false,
+    };
+    function_list.update_indices();
+
+    // println!("list: {:#?}", manual_list);
+    println!("list: {:#?}", function_list);
 }

@@ -154,7 +154,9 @@ where
         return Ok(current_node);
     }
 
-    pub fn find_by_value(self, value: T) {}
+    pub fn find_by_value(self, value: T) {
+
+    }
 
     pub fn is_empty(&self) -> bool {
         if self.length > 0 {
@@ -264,21 +266,21 @@ mod tests {
     }
 
     #[test]
-    pub fn test_empty_ordered_equals_true_update() {
+    pub fn test_empty_ordered_equals_true_update_indices() {
         let mut list: LinkedList<i64> = LinkedList::new();
         list.update_indices();
         assert_eq!(list, LinkedList::new());
     }
 
     #[test]
-    pub fn test_empty_ordered_equals_false_update() {
+    pub fn test_empty_ordered_equals_false_update_indices() {
         let mut list: LinkedList<i64> = LinkedList { head: None, tail: None, length: 0, ordered: false };
         list.update_indices();
         assert_eq!(list, LinkedList::new());
     }
 
     #[test]
-    pub fn test_one_ordered_equals_true_update() {
+    pub fn test_one_ordered_equals_true_update_indices() {
         let data_vec: Vec<i64> = vec![2];
         let mut list: LinkedList<i64> = LinkedList::from(data_vec.clone());
         list.update_indices();
@@ -286,7 +288,7 @@ mod tests {
     }
 
     #[test]
-    pub fn test_one_ordered_equals_false_update() {
+    pub fn test_one_ordered_equals_false_update_indices() {
         let data_vec: Vec<i64> = vec![2];
         let manual_list = LinkedList::from(data_vec);
 
@@ -304,7 +306,7 @@ mod tests {
     }
 
     #[test]
-    pub fn test_two_ordered_equals_false_update() {
+    pub fn test_two_ordered_equals_false_update_indices() {
         let (index, value): (usize, i64) = (8, 2);
         let (index_1, value_1): (usize, i64) = (2, 37);
 
@@ -329,13 +331,37 @@ mod tests {
         };
         function_list.update_indices();
 
-        
-
         assert_eq!(manual_list, function_list);
     }
 
     #[test]
-    pub fn test_four_update() {}
+    pub fn test_five_ordered_equals_false_update_indices() {
+        let (index, value): (usize, i64) = (8, 2);
+        let (index_1, value_1): (usize, i64) = (2, 37);
+
+        let data_vec: Vec<i64> = vec![value, value_1];
+        let manual_list: LinkedList<i64> = LinkedList::from(data_vec);
+
+        let node_1: Node<i64> = Node {
+            index: Some(index_1),
+            data: Some(value_1), 
+            next: None,
+        };
+        let node: Node<i64> = Node {
+            index: Some(index),
+            data: Some(value), 
+            next: Some(Rc::new(RefCell::new(node_1.clone()))),
+        };
+        let mut function_list: LinkedList<i64> = LinkedList {
+            head: Some(Rc::new(RefCell::new(node))),
+            tail: Some(Rc::new(RefCell::new(node_1))),
+            length: 2,
+            ordered: false,
+        };
+        function_list.update_indices();
+
+        assert_eq!(manual_list, function_list);
+    }
 
     #[test]
     pub fn test_empty_push_to_front() {}
