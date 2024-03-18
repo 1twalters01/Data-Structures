@@ -1,5 +1,4 @@
-#![allow(dead_code)]
-#![allow(unused_imports)]
+#![allow(unused_variables)]
 
 use std::rc::Rc;
 use std::cell::RefCell;
@@ -94,16 +93,12 @@ where
     pub fn add_before(index: usize) {}
 
     pub fn add_after(index: usize) {}
-
-    // println!("number of head clones: {:?}", self.head);
 }
 
 
 
 #[cfg(test)]
 mod tests {
-    use std::i64;
-
     use super::*;
 
     #[test]
@@ -137,6 +132,7 @@ mod tests {
         assert_eq!(manual_list, function_list);
     }
 
+    #[test]
     fn test_one_linked_list_from() {
         let (index, value): (usize, i64) = (0, 8);
         let manual_list = LinkedList {
@@ -151,6 +147,7 @@ mod tests {
 
     }
 
+    #[test]
     fn test_four_linked_list_from() {
         let (index, value): (usize, i64) = (0, 8);
         let (index_1, value_1): (usize, i64) = (1, 56);
@@ -189,6 +186,13 @@ mod tests {
         assert_eq!(manual_list, function_list);
  
     }
+
+    #[test]
+    pub fn push_to_front() {}
+
+    #[test]
+    pub fn pop_from_front() {}
+
 
     #[test]
     fn test_empty_into_front() {
@@ -264,6 +268,15 @@ mod tests {
 
         assert_eq!(manual_list, function_list);
     }
+    
+    #[test]
+    fn test_empty_pop_from_end() {}
+
+    #[test]
+    fn test_one_pop_from_end() {}
+
+    #[test]
+    fn test_pop_from_end() {}
 
     #[test]
     fn test_empty_into_back() {
@@ -283,6 +296,39 @@ mod tests {
     }
 
     #[test]
+    fn test_empty_find_by_index() {}
+
+    #[test]
+    fn test_zeroth_index_find_by_index() {}
+
+    #[test]
+    fn test_last_index_find_by_index() {}
+
+    #[test]
+    fn test_inside_index_find_by_index() {}
+
+    #[test]
+    fn test_outside_index_find_by_index() {}
+
+    #[test]
+    fn find_empty_invalid_by_value() {}
+
+    #[test]
+    fn find_none_invalid_by_value() {}
+
+    #[test]
+    fn find_invalid_by_value() {}
+
+    #[test]
+    fn find_valid_first_by_value() {}
+
+    #[test]
+    fn find_valid_last_by_value() {}
+
+    #[test]
+    fn find_valid_by_value() {}
+
+    #[test]
     fn test_empty_is_empty() {
         let list: LinkedList<i64> = LinkedList::new();
         assert_eq!(true, list.is_empty());
@@ -294,4 +340,34 @@ mod tests {
         let list: LinkedList<i64> = LinkedList::from(data_vec);
         assert_eq!(false, list.is_empty());
     }
+
+    #[test]
+    pub fn test_empty_add_before() {}
+
+    #[test]
+    pub fn test_one_add_before() {}
+
+    #[test]
+    pub fn test_first_add_before() {}
+
+    #[test]
+    pub fn test_last_add_before() {}
+
+    #[test]
+    pub fn test_add_before() {}
+
+    #[test]
+    pub fn test_empty_add_after() {}
+
+    #[test]
+    pub fn test_one_add_after() {}
+
+    #[test]
+    pub fn test_first_add_after() {}
+
+    #[test]
+    pub fn test_last_add_after() {}
+
+    #[test]
+    pub fn test_add_after() {}
 }
