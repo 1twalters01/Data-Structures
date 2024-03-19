@@ -57,10 +57,9 @@ where
             return;
         }
 
-        let mut count = 0;
         let mut current_node: Rc<RefCell<Node<T>>> = self.head.as_mut().unwrap().clone();
-        let continue_loop: bool = true;
-        // println!("count {}", count);
+        let mut count = 0;
+        // let continue_loop: bool = true;
         while count < self.length {
             current_node.borrow_mut().index = Some(count);
             let some_node: Option<Rc<RefCell<Node<T>>>> = current_node.clone().borrow().clone().next;
@@ -73,21 +72,70 @@ where
             count += 1;
         }
 
-        // while current_node.borrow().clone().next.unwrap().borrow().next != None {
-        //     println!("index: {:?}", self);
-        //     current_node.borrow_mut().index = Some(count);
-        //     println!("index: {:?}", self);
-        //     current_node = current_node.clone().borrow().clone().next.unwrap();
-        //     count += 1;
-        // }
-
-
         self.ordered = true;
     }
 
-    pub fn push_to_front(&mut self, data: T) {}
+    pub fn push_to_front(&mut self, data: T) {
+        let mut node: Node<T> = Node::from(0, data);
+        node.next = self.head.clone();
+        self.head = Some(Rc::new(RefCell::from(node)));
+        if self.tail == None {
+            self.tail = self.head.clone();
+        }
 
-    pub fn pop_from_front(&mut self) {}
+        self.length += 1;
+        self.ordered = false;
+        self.update_indices();
+    }
+
+    pub fn unordered_push_to_front(&mut self, data: T) {
+        let mut node: Node<T> = Node::from(0, data);
+        node.next = self.head.clone();
+        self.head = Some(Rc::new(RefCell::from(node)));
+        if self.tail == None {
+            self.tail = self.head.clone();
+        }
+
+        self.length += 1;
+        self.ordered = false;
+    }
+
+    pub fn pop_from_front(&mut self) -> Result<(), Error> {
+        self.ordered = false;
+
+        if self.head == None {
+            return Err(Error);
+        }
+
+        self.head = self.head.clone().unwrap().borrow().clone().next;
+        if self.head == None {
+            self.ordered = true;
+            self.tail = None;
+        }
+
+        self.length -= 1;
+        self.update_indices();
+
+        return Ok(());
+    }
+
+    pub fn unordered_pop_from_front(&mut self) -> Result<(), Error> {
+        self.ordered = false;
+        
+        if self.head == None {
+            return Err(Error);
+        }
+
+        self.head = self.head.clone().unwrap().borrow().clone().next;
+        if self.head == None {
+            self.ordered = true;
+            self.tail = None;
+        }
+
+        self.length -= 1;
+
+        return Ok(());
+    }
 
     pub fn into_front(self) -> Option<T> {
         match self.head {
@@ -364,19 +412,212 @@ mod tests {
     }
 
     #[test]
-    pub fn test_empty_push_to_front() {}
+    pub fn test_empty_push_to_front() {
+        let value: i64 = 27;
+        let data_vec: Vec<i64> = vec![value];
+        let manual_list: LinkedList<i64> = LinkedList::from(data_vec);
+
+        let mut function_list: LinkedList<i64> = LinkedList::new();
+        function_list.push_to_front(value);
+        
+        assert_eq!(manual_list, function_list);
+    }
 
     #[test]
-    pub fn test_push_to_front() {}
+    pub fn test_one_push_to_front() {
+        let (value, value_1): (i64, i64) = (27, 39);
+        let data_vec: Vec<i64> = vec![value, value_1];
+        let manual_list: LinkedList<i64> = LinkedList::from(data_vec);
+
+        let mut function_list: LinkedList<i64> = LinkedList::new();
+        function_list.push_to_front(value_1);
+        function_list.push_to_front(value);
+
+        assert_eq!(manual_list, function_list);
+    }
 
     #[test]
-    pub fn test_empty_pop_from_front() {}
+    pub fn test_push_to_front() {
+        let (value, value_1, value_2, value_3) = (3, 54, 29, 12);
+        let data_vec: Vec<i64> = vec![value, value_1, value_2, value_3];
+        let manual_list: LinkedList<i64> = LinkedList::from(data_vec);
+
+        let mut function_list: LinkedList<i64> = LinkedList::new();
+        function_list.push_to_front(value_3);
+        function_list.push_to_front(value_2);
+        function_list.push_to_front(value_1);
+        function_list.push_to_front(value);
+
+        assert_eq!(manual_list, function_list);
+    }
 
     #[test]
-    pub fn test_one_pop_from_front() {}
+    pub fn test_empty_unordered_push_to_front() {
+        let value: i64 = 27;
+        let data_vec: Vec<i64> = vec![value];
+        let manual_list: LinkedList<i64> = LinkedList::from(data_vec);
+
+        let mut function_list: LinkedList<i64> = LinkedList::new();
+        function_list.unordered_push_to_front(value);
+        assert_ne!(manual_list, function_list);
+
+        function_list.update_indices();
+        assert_eq!(manual_list, function_list);
+    }
 
     #[test]
-    pub fn test_pop_from_front() {}
+    pub fn test_one_unordered_push_to_front() {
+        let (value, value_1): (i64, i64) = (27, 39);
+        let data_vec: Vec<i64> = vec![value, value_1];
+        let manual_list: LinkedList<i64> = LinkedList::from(data_vec);
+
+        let mut function_list: LinkedList<i64> = LinkedList::new();
+        function_list.unordered_push_to_front(value_1);
+        function_list.unordered_push_to_front(value);
+        assert_ne!(manual_list, function_list);
+
+        function_list.update_indices();
+        assert_eq!(manual_list, function_list);
+
+    }
+
+    #[test]
+    pub fn test_unordered_push_to_front() {
+        let (value, value_1, value_2, value_3) = (3, 54, 29, 12);
+        let data_vec: Vec<i64> = vec![value, value_1, value_2, value_3];
+        let manual_list: LinkedList<i64> = LinkedList::from(data_vec);
+
+        let mut function_list: LinkedList<i64> = LinkedList::new();
+        function_list.unordered_push_to_front(value_3);
+        function_list.unordered_push_to_front(value_2);
+        function_list.unordered_push_to_front(value_1);
+        function_list.unordered_push_to_front(value);
+        assert_ne!(manual_list, function_list);
+
+        function_list.update_indices();
+        assert_eq!(manual_list, function_list);
+}
+
+    #[test]
+    pub fn test_empty_pop_from_front() {
+        let mut list: LinkedList<i64> = LinkedList::new();
+        let res = list.pop_from_front();
+        assert_eq!(res.is_err(), true);
+    }
+
+    #[test]
+    pub fn test_one_pop_from_front() {
+        let manual_list: LinkedList<i64> = LinkedList::new();
+        
+        let data_vec: Vec<i64> = vec![2];
+        let mut function_list: LinkedList<i64> = LinkedList::from(data_vec);
+        let _ = function_list.pop_from_front();
+
+        assert_eq!(manual_list, function_list)
+    }
+
+    #[test]
+    pub fn test_pop_from_front() {
+        let (index, value): (usize, i64) = (0, 8);
+        let (index_1, value_1): (usize, i64) = (1, 56);
+        let (index_2, value_2): (usize, i64) = (2, 19);
+        let (index_3, value_3): (usize, i64) = (3, 80);
+        let (index_4, value_4): (usize, i64) = (3, 22);
+
+        let node_3: Node<i64> = Node {
+            index: Some(index_3),
+            data: Some(value_3), 
+            next: None,
+        };
+        let node_2: Node<i64> = Node {
+            index: Some(index_2),
+            data: Some(value_2), 
+            next: Some(Rc::new(RefCell::new(node_3.clone()))),
+        };
+        let node_1: Node<i64> = Node {
+            index: Some(index_1),
+            data: Some(value_1), 
+            next: Some(Rc::new(RefCell::new(node_2))),
+        };
+        let node: Node<i64> = Node {
+            index: Some(index),
+            data: Some(value), 
+            next: Some(Rc::new(RefCell::new(node_1))),
+        };
+        let manual_list: LinkedList<i64> = LinkedList {
+            head: Some(Rc::new(RefCell::new(node))),
+            tail: Some(Rc::new(RefCell::new(node_3))),
+            length: 4,
+            ordered: true,
+        };
+
+        let data_vec: Vec<i64> = vec![value_4, value, value_1, value_2, value_3];
+        let mut function_list: LinkedList<i64> = LinkedList::from(data_vec);
+        let _ = function_list.pop_from_front();
+
+        assert_eq!(manual_list, function_list);
+    }
+
+    #[test]
+    pub fn test_empty_unordered_pop_from_front() {
+        let mut list: LinkedList<i64> = LinkedList::new();
+        let res = list.pop_from_front();
+        assert_eq!(res.is_err(), true);
+    }
+
+    #[test]
+    pub fn test_one_unordered_pop_from_front() {
+        let manual_list: LinkedList<i64> = LinkedList::new();
+        
+        let data_vec: Vec<i64> = vec![2];
+        let mut function_list: LinkedList<i64> = LinkedList::from(data_vec);
+        let _ = function_list.unordered_pop_from_front();
+        assert_eq!(manual_list, function_list)
+    }
+
+    #[test]
+    pub fn test_unordered_pop_from_front() {
+        let (index, value): (usize, i64) = (0, 8);
+        let (index_1, value_1): (usize, i64) = (1, 56);
+        let (index_2, value_2): (usize, i64) = (2, 19);
+        let (index_3, value_3): (usize, i64) = (3, 80);
+        let (index_4, value_4): (usize, i64) = (3, 22);
+
+        let node_3: Node<i64> = Node {
+            index: Some(index_3),
+            data: Some(value_3), 
+            next: None,
+        };
+        let node_2: Node<i64> = Node {
+            index: Some(index_2),
+            data: Some(value_2), 
+            next: Some(Rc::new(RefCell::new(node_3.clone()))),
+        };
+        let node_1: Node<i64> = Node {
+            index: Some(index_1),
+            data: Some(value_1), 
+            next: Some(Rc::new(RefCell::new(node_2))),
+        };
+        let node: Node<i64> = Node {
+            index: Some(index),
+            data: Some(value), 
+            next: Some(Rc::new(RefCell::new(node_1))),
+        };
+        let manual_list: LinkedList<i64> = LinkedList {
+            head: Some(Rc::new(RefCell::new(node))),
+            tail: Some(Rc::new(RefCell::new(node_3))),
+            length: 4,
+            ordered: true,
+        };
+
+        let data_vec: Vec<i64> = vec![value_4, value, value_1, value_2, value_3];
+        let mut function_list: LinkedList<i64> = LinkedList::from(data_vec);
+        let _ = function_list.unordered_pop_from_front();
+        assert_ne!(manual_list, function_list);
+
+        function_list.update_indices();
+        assert_eq!(manual_list, function_list);
+    }
 
     #[test]
     fn test_empty_into_front() {
@@ -479,11 +720,6 @@ mod tests {
         let (index_3, value_3): (usize, i64) = (3, 80);
         let (index_4, value_4): (usize, i64) = (4, 20);
 
-        // let node_4: Node<i64> = Node {
-        //     index: Some(index_4),
-        //     data: Some(value_4),
-        //     next: None,
-        // };
         let node_3: Node<i64> = Node {
             index: Some(index_3),
             data: Some(value_3), 
