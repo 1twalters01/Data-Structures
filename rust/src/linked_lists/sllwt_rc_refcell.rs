@@ -187,15 +187,22 @@ where
     }
 
     pub fn find_node_by_index(&mut self, index: usize) -> Result<Rc<RefCell<Node<T>>>, Error> {
-        if index > self.length {
+        if index >= self.length  {
             return Err(Error)
         }
-
-        let count = 0;
+        
+        let mut count = 0;
         let mut current_node: Rc<RefCell<Node<T>>> = self.head.clone().unwrap();
-        while current_node.borrow().clone().index.unwrap() < self.length - 2 {
+        while current_node.borrow().clone().index.unwrap() < self.length {
             current_node.borrow_mut().index = Some(count);
-            current_node = current_node.clone().borrow().clone().next.unwrap();
+            if count == index {
+                break
+            }
+            match current_node.clone().borrow().clone().next {
+                Some(node) => current_node = node,
+                None => break,
+            }
+            count += 1;
         }
 
         self.ordered = true;
@@ -836,51 +843,51 @@ mod tests {
             ordered: true,
         };
 
-        let function_node: Rc<RefCell<Node<i64>>> = list.find_node_by_index(4).unwrap();
+        let function_node: Rc<RefCell<Node<i64>>> = list.find_node_by_index(0).unwrap();
         let manual_node: Rc<RefCell<Node<i64>>> = Rc::new(RefCell::new(node));
 
         assert_eq!(manual_node, function_node);
     }
 
-    // #[test]
-    // fn test_last_index_find_node_by_index() {
-    //     let (index, value): (usize, i64) = (0, 8);
-    //     let (index_1, value_1): (usize, i64) = (1, 56);
-    //     let (index_2, value_2): (usize, i64) = (2, 19);
-    //     let (index_3, value_3): (usize, i64) = (3, 80);
-    //
-    //     let node_3: Node<i64> = Node {
-    //         index: Some(index_3),
-    //         data: Some(value_3), 
-    //         next: None,
-    //     };
-    //     let node_2: Node<i64> = Node {
-    //         index: Some(index_2),
-    //         data: Some(value_2), 
-    //         next: Some(Rc::new(RefCell::new(node_3.clone()))),
-    //     };
-    //     let node_1: Node<i64> = Node {
-    //         index: Some(index_1),
-    //         data: Some(value_1), 
-    //         next: Some(Rc::new(RefCell::new(node_2.clone()))),
-    //     };
-    //     let node: Node<i64> = Node {
-    //         index: Some(index),
-    //         data: Some(value), 
-    //         next: Some(Rc::new(RefCell::new(node_1))),
-    //     };
-    //     let mut list: LinkedList<i64> = LinkedList {
-    //         head: Some(Rc::new(RefCell::new(node))),
-    //         tail: Some(Rc::new(RefCell::new(node_3.clone()))),
-    //         length: 4,
-    //         ordered: true,
-    //     };
-    //
-    //     let function_node: Rc<RefCell<Node<i64>>> = list.find_node_by_index(3).unwrap();
-    //     let manual_node: Rc<RefCell<Node<i64>>> = Rc::new(RefCell::new(node_3));
-    //
-    //     assert_eq!(manual_node, function_node);
-    // }
+    #[test]
+    fn test_last_index_find_node_by_index() {
+        let (index, value): (usize, i64) = (0, 8);
+        let (index_1, value_1): (usize, i64) = (1, 56);
+        let (index_2, value_2): (usize, i64) = (2, 19);
+        let (index_3, value_3): (usize, i64) = (3, 80);
+
+        let node_3: Node<i64> = Node {
+            index: Some(index_3),
+            data: Some(value_3), 
+            next: None,
+        };
+        let node_2: Node<i64> = Node {
+            index: Some(index_2),
+            data: Some(value_2), 
+            next: Some(Rc::new(RefCell::new(node_3.clone()))),
+        };
+        let node_1: Node<i64> = Node {
+            index: Some(index_1),
+            data: Some(value_1), 
+            next: Some(Rc::new(RefCell::new(node_2.clone()))),
+        };
+        let node: Node<i64> = Node {
+            index: Some(index),
+            data: Some(value), 
+            next: Some(Rc::new(RefCell::new(node_1))),
+        };
+        let mut list: LinkedList<i64> = LinkedList {
+            head: Some(Rc::new(RefCell::new(node))),
+            tail: Some(Rc::new(RefCell::new(node_3.clone()))),
+            length: 4,
+            ordered: true,
+        };
+
+        let function_node: Rc<RefCell<Node<i64>>> = list.find_node_by_index(3).unwrap();
+        let manual_node: Rc<RefCell<Node<i64>>> = Rc::new(RefCell::new(node_3));
+
+        assert_eq!(manual_node, function_node);
+    }
 
     #[test]
     fn test_inside_index_find_node_by_index() {
@@ -923,16 +930,16 @@ mod tests {
 
     }
 
-    // #[test]
-    // fn test_outside_index_find_node_by_index() {
-    //     let value: i64 = 43;
-    //     let value_1: i64 = 17;
-    //     let value_2: i64 = 99;
-    //     let data_vec: Vec<i64> = vec![value, value_1, value_2];
-    //     let mut list: LinkedList<i64> = LinkedList::from(data_vec);
-    //     let res = list.find_node_by_index(3);
-    //     assert_eq!(res.is_err(), true);
-    // }
+    #[test]
+    fn test_outside_index_find_node_by_index() {
+        let value: i64 = 43;
+        let value_1: i64 = 17;
+        let value_2: i64 = 99;
+        let data_vec: Vec<i64> = vec![value, value_1, value_2];
+        let mut list: LinkedList<i64> = LinkedList::from(data_vec);
+        let res = list.find_node_by_index(3);
+        assert_eq!(res.is_err(), true);
+    }
 
     #[test]
     fn test_empty_invalid_find_node_by_value() {
